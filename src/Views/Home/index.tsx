@@ -6,10 +6,12 @@ import ForecastResult from "./components/forecastResult";
 import { getWeatherData } from "@/services/forecast.service";
 import ForecastResponse from "@/models/Home/forecastApiResponse.model";
 import { getHoursArray } from "@/services/forecast.service";
+import Loader from "./components/loader";
 
 
 export default function Home() {
   const [isCelsius, setIsCelsius] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [responseData, setResponseData] = useState<ForecastResponse>();
 
   const changeDegreeType = () => {
@@ -24,10 +26,12 @@ export default function Home() {
           const { latitude, longitude } = position.coords;
           getWeatherData(`${latitude},${longitude}`).then((res) => {
             setResponseData(res);
+            setIsLoading(false)
           });
         },
         (error) => {
           console.error("Error getting user location:", error);
+          setIsLoading(false)
         }
       );
     } else {
@@ -35,7 +39,7 @@ export default function Home() {
     }
   }, []);
 
-  return (
+  return isLoading ? <Loader /> : (
     <div className=" bg-hero-image py-10 bg-no-repeat bg-center  bg-cover w-[100dvw] overflow-x-hidden min-h-screen">
       <Navbar changeDegreeType={changeDegreeType} isCelsius={isCelsius} />
       <GeneralInfo
